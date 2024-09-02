@@ -127,9 +127,11 @@
     </div>
 
     <script>
+        // Initialize students data from LocalStorage
         let students = JSON.parse(localStorage.getItem('students')) || {};
         const clearPassword = "study123"; // Password to clear the data
 
+        // Function to add study info
         function addStudyInfo() {
             const name = document.getElementById('studentName').value.trim();
             const hours = parseInt(document.getElementById('studyHours').value);
@@ -141,6 +143,7 @@
                     students[name] = hours;
                 }
 
+                // Save updated data to LocalStorage
                 localStorage.setItem('students', JSON.stringify(students));
                 displayStudentList();
                 document.getElementById('studyForm').reset();
@@ -150,6 +153,7 @@
             }
         }
 
+        // Function to clear all data
         function clearAllData() {
             const userInput = prompt("Enter the password to clear all data:");
             if (userInput === clearPassword) {
@@ -162,12 +166,15 @@
             }
         }
 
+        // Function to display the student list
         function displayStudentList() {
             const studentListDiv = document.getElementById('studentList');
             studentListDiv.innerHTML = '';
 
+            // Sort students by hours studied
             const sortedStudents = Object.keys(students).sort((a, b) => students[b] - students[a]);
 
+            // Display sorted student list with awards
             sortedStudents.forEach((student, index) => {
                 let emoji = '';
                 if (index === 0) emoji = '🥇';
@@ -178,6 +185,7 @@
             });
         }
 
+        // Display the student list when the page loads
         window.onload = displayStudentList;
     </script>
 </body>
