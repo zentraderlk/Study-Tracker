@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="img/favicon.png" type="image/png">
+    <title>Study Tracker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        label {
+            display: block;
+            text-align: left;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #eafaf1;
+            border-left: 5px solid #27ae60;
+            border-radius: 5px;
+            color: #2c3e50;
+            text-align: left;
+            font-size: 14px;
+        }
+        .student-list {
+            margin-top: 20px;
+        }
+        .student-list p {
+            margin: 5px 0;
+            padding: 10px;
+            background-color: #f4f4f4;
+            border-left: 4px solid #3498db;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+            }
+            label {
+                font-size: 12px;
+            }
+            input[type="text"],
+            input[type="number"],
+            button {
+                font-size: 14px;
+            }
+            .result {
+                font-size: 12px;
+                padding: 10px;
+            }
+            .student-list p {
+                font-size: 12px;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Study Tracker</h1>
+        <form id="studyForm">
+            <label for="studentName">Student Name:</label>
+            <input type="text" id="studentName" name="studentName" required>
+
+            <label for="studyHours">Hours Studied:</label>
+            <input type="number" id="studyHours" name="studyHours" required min="0">
+
+            <button type="button" onclick="addStudyInfo()">Submit</button>
+            <button type="button" onclick="clearAllData()">Clear All</button>
+        </form>
+
+        <div class="result" id="result"></div>
+        <div class="student-list" id="studentList"></div>
+    </div>
+
+    <script>
+        let students = JSON.parse(localStorage.getItem('students')) || {};
+        const clearPassword = "study123"; // Password to clear the data
+
+        function addStudyInfo() {
+            const name = document.getElementById('studentName').value.trim();
+            const hours = parseInt(document.getElementById('studyHours').value);
+
+            if (name && hours >= 0) {
+                if (students[name]) {
+                    students[name] += hours;
+                } else {
+                    students[name] = hours;
+                }
+
+                localStorage.setItem('students', JSON.stringify(students));
+                displayStudentList();
+                document.getElementById('studyForm').reset();
+                document.getElementById('result').innerHTML = `<p>${name} studied for ${hours} hours. Total hours: ${students[name]}</p>`;
+            } else {
+                document.getElementById('result').innerHTML = '<p>Please fill out both fields with valid data.</p>';
+            }
+        }
+
+        function clearAllData() {
+            const userInput = prompt("Enter the password to clear all data:");
+            if (userInput === clearPassword) {
+                localStorage.removeItem('students');
+                students = {};
+                displayStudentList();
+                document.getElementById('result').innerHTML = '<p>All data has been cleared.</p>';
+            } else if (userInput !== null) {
+                alert("Incorrect password. Data not cleared.");
+            }
+        }
+
+        function displayStudentList() {
+            const studentListDiv = document.getElementById('studentList');
+            studentListDiv.innerHTML = '';
+
+            const sortedStudents = Object.keys(students).sort((a, b) => students[b] - students[a]);
+
+            sortedStudents.forEach((student, index) => {
+                let emoji = '';
+                if (index === 0) emoji = '🥇';
+                if (index === 1) emoji = '🥈';
+                if (index === 2) emoji = '🥉';
+
+                studentListDiv.innerHTML += `<p><strong>${index + 1}. ${emoji} ${student}</strong>: ${students[student]} hours</p>`;
+            });
+        }
+
+        window.onload = displayStudentList;
+    </script>
+</body>
+</html>
